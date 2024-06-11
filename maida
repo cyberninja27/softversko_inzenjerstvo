@@ -1,0 +1,71 @@
+import customtkinter as ctk
+from tkinter import messagebox
+
+def submit_comment():
+    comment = text_box.get("1.0", "end").strip()
+    if comment:
+        selected_option = radio_var.get()
+        messagebox.showinfo("Komentar", f"Vaš komentar je poslan:\n{comment}\nOdabrana ocjena: {selected_option}")
+        text_box.delete("1.0", "end")
+        # Display the comment in the comments frame
+        new_comment = f"Komentar: {comment} | Ocjena: {selected_option}"
+        comment_label = ctk.CTkLabel(comments_frame, text=new_comment, anchor="w")
+        comment_label.pack(fill='x', padx=10, pady=5)
+    else:
+        messagebox.showwarning("Upozorenje", "Komentar ne može biti prazan.")
+
+def undo_action(event=None):
+    try:
+        text_box.edit_undo()
+    except:
+        pass
+
+# Kreiranje glavnog prozora
+ctk.set_appearance_mode("dark")  # Opcije su "dark", "light", "system"
+ctk.set_default_color_theme("blue")  # Postavljanje zadane teme na plavu
+
+root = ctk.CTk()
+root.title("Prozor za Komentar")
+
+# Postavljanje prozora na fullscreen
+root.attributes('-fullscreen', True)
+
+# Kreiranje i postavljanje teksta za unos komentara
+label = ctk.CTkLabel(root, text="Unesite vaš komentar:")
+label.pack(pady=20)
+
+# Kreiranje okvira za tekstualni unos i radio dugmad
+input_frame = ctk.CTkFrame(root)
+input_frame.pack(pady=20, padx=20)
+
+# Kreiranje tekstualnog okvira za unos komentara
+text_box = ctk.CTkTextbox(input_frame, height=200, width=400, undo=True)  # Enable undo
+text_box.grid(row=0, column=0, rowspan=6, padx=(0, 20))
+
+# Bind the Ctrl+Z key to the undo_action function
+text_box.bind("<Control-z>", undo_action)
+
+# Kreiranje labela za ocjenu
+rating_label = ctk.CTkLabel(input_frame, text="Ocjena:")
+rating_label.grid(row=0, column=1, pady=(0, 10), sticky="w")
+
+# Kreiranje varijable za radio dugmad
+radio_var = ctk.StringVar(value="1")  # Default value is "1"
+
+# Kreiranje radio dugmadi
+radio_buttons = []
+for i in range(1, 6):
+    rb = ctk.CTkRadioButton(input_frame, text=f"{i}", variable=radio_var, value=str(i))
+    rb.grid(row=i, column=1, sticky="w")
+    radio_buttons.append(rb)
+
+# Kreiranje dugmeta za slanje komentara
+submit_button = ctk.CTkButton(root, text="Pošalji", command=submit_comment)
+submit_button.pack(pady=20)
+
+# Kreiranje okvira za prikazivanje komentara
+comments_frame = ctk.CTkFrame(root)
+comments_frame.pack(fill='both', expand=True, padx=20, pady=20)
+
+# Pokretanje glavne petlje
+root.mainloop()
